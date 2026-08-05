@@ -6,3 +6,7 @@ ruff==0.16.1
 mypy==2.3.0
 pytest-cov==7.1.0
 pip-audit==2.10.1
+# starlette.testclient (used by every API-level test) requires httpx --
+# not a direct import anywhere in tests/, so it was easy to have installed
+# locally without ever landing in this file until CI actually ran for real.
+httpx==0.28.1
