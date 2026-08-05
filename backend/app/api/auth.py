@@ -1,3 +1,5 @@
+import os
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -25,7 +27,24 @@ class LoginRequest(BaseModel):
 def demo_hint(db: Session = Depends(get_db)):
     """Public (no auth) -- tells the login page whether the seeded demo
     accounts actually exist on this install, so it never shows credentials
-    that would just fail on a real production setup (see User.is_demo)."""
+    that would just fail on a real production setup (see User.is_demo).
+
+    B6 (Review #2 remediation): this must stay callable pre-login (it's
+    what the login page itself uses to decide whether to render the hint,
+    before any token exists -- see LoginPage.tsx) -- Depends(get_current_user)
+    would make it always 401 and silently break the hint on every real
+    demo/dev use, not just close the reconnaissance angle. The actual
+    finding was that an anonymous caller against a real production install
+    could poll this to check whether well-known demo credentials exist
+    there. seed.py already gates demo-account *creation* on
+    CABLELIMS_ALLOW_DEMO_USERS=1 being set in the environment -- a real
+    install never sets it, so gating the *hint* on the same variable closes
+    the oracle there without ever touching the database (nothing to learn
+    from probing it) while leaving local dev/demo use, which already has
+    the variable set, completely unaffected.
+    """
+    if os.environ.get("CABLELIMS_ALLOW_DEMO_USERS") != "1":
+        return {"show_demo_hint": False}
     has_demo = db.query(User).filter(User.is_demo == True).first() is not None  # noqa: E712
     return {"show_demo_hint": has_demo}
 

@@ -1,13 +1,20 @@
 """
-Regression tests for H3 (replace ad-hoc startup schema-sync with Alembic).
+Regression tests for H3 (replace ad-hoc startup schema-sync with Alembic)
+and B1 (Review #2 remediation: the fresh-install regression H3's own
+heuristic introduced).
 
-Three things are under test:
+Under test:
 1. A brand-new (empty) database ends up with exactly the schema
    Base.metadata describes, via the baseline migration -- not create_all().
-2. A pre-Alembic database (the old create_all()+sync_schema() startup pair,
-   which every install before this change has) gets stamped at the
+2. A genuinely pre-Alembic database (the old create_all()+sync_schema()
+   startup pair, which every install before H3 has) gets stamped at the
    baseline revision rather than replayed, and isn't touched further.
-3. Running migrations at startup must not disable the app's own "cablelims"
+3. B1: a database built via Base.metadata.create_all() -- always today's
+   full model schema, i.e. always exactly HEAD, never baseline -- gets
+   stamped at head directly instead of being misclassified as case 2 and
+   crashing when the replay tries to CREATE INDEX on indexes that already
+   exist. This is the exact install-blocking regression Review #2 found.
+4. Running migrations at startup must not disable the app's own "cablelims"
    logger. This was a real bug found while implementing H3: Alembic's
    env.py calls logging.config.fileConfig() to load alembic.ini's logging
    section, whose default disable_existing_loggers=True silently disabled
@@ -67,6 +74,34 @@ def test_run_migrations_stamps_rather_than_replays_a_pre_alembic_database(tmp_pa
     # reaches a database that predates Alembic, same as a brand-new one.
     assert stamped == current_head
     assert current_head != BASELINE_REVISION  # sanity: a later migration does exist to prove this
+    assert set(Base.metadata.tables.keys()) <= set(inspector.get_table_names())
+
+
+def test_run_migrations_stamps_head_for_a_create_all_built_database(tmp_path):
+    # B1 (Review #2 remediation): reproduces the exact failure the review
+    # found -- python -m app.seed --config-only followed by
+    # python -m app.create_user, both of which (before this fix) called
+    # Base.metadata.create_all() against the real engine. That builds
+    # today's full schema but writes no alembic_version row, which used to
+    # be indistinguishable from a genuinely pre-Alembic database to
+    # run_migrations()'s heuristic.
+    db_path = tmp_path / "create_all_built.db"
+    engine = create_engine(f"sqlite:///{db_path}")
+    Base.metadata.create_all(bind=engine)
+    inspector = inspect(engine)
+    assert "alembic_version" not in inspector.get_table_names()
+    assert "users" in inspector.get_table_names()
+
+    run_migrations(engine)  # must not raise "index already exists"
+
+    inspector = inspect(engine)
+    with engine.connect() as conn:
+        stamped = conn.exec_driver_sql("SELECT version_num FROM alembic_version").scalar()
+    script_dir = ScriptDirectory.from_config(_alembic_config(engine))
+    current_head = script_dir.get_current_head()
+    # Stamped directly at head -- not baseline -- because the schema was
+    # already there; no replay needed or attempted.
+    assert stamped == current_head
     assert set(Base.metadata.tables.keys()) <= set(inspector.get_table_names())
 
 

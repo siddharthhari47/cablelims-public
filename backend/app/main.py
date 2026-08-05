@@ -42,6 +42,39 @@ app.add_middleware(
 
 
 @app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    # B10 (Review #2 remediation): applied globally rather than per-route --
+    # the diagram-download endpoint already set X-Content-Type-Options
+    # itself (C7), which becomes redundant once every response carries it,
+    # but is left in place rather than touched on a working, review-praised
+    # code path.
+    #
+    # No Content-Security-Policy here: the app serves its own built
+    # frontend from the same origin with no third-party script sources, and
+    # a CSP written without a concrete threat model tends to be either a
+    # no-op or something that silently breaks the app (e.g. Mantine's
+    # runtime style injection). Not adding one is a deliberate choice, not
+    # an oversight -- revisit if a real third-party script/embed is ever
+    # introduced.
+    response = await call_next(request)
+    # Browsers must not guess a response's content type from its body --
+    # relevant here mainly for uploaded-then-served images (C17 already
+    # re-encodes them, this is defense in depth, not the primary control).
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    # This app is never meant to be framed by another site -- refusing
+    # outright (rather than SAMEORIGIN) closes clickjacking against the
+    # login page with no legitimate use case given up.
+    response.headers["X-Frame-Options"] = "DENY"
+    # Send the full URL on a same-origin navigation (useful for this app's
+    # own audit trail / support workflow) but only the origin, not the full
+    # path/query, to any cross-origin request -- e.g. a sample ID or
+    # certificate number should never leak into another site's referer log
+    # merely because someone clicked an external link from this app.
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
+
+
+@app.middleware("http")
 async def request_logging_middleware(request: Request, call_next):
     # A client-supplied X-Request-ID is honoured (lets a future reverse
     # proxy or the frontend correlate its own logs), otherwise one is

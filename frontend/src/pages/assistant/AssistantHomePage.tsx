@@ -19,10 +19,12 @@ export default function AssistantHomePage() {
   const load = useCallback(async () => {
     try {
       const res = await api.get('/samples')
-      setSamples(res.data)
+      // B7 (Review #2 remediation): GET /api/samples now returns
+      // {total, samples} (pagination) instead of a bare array.
+      setSamples(res.data.samples)
       setCachedAt(null)
       setLoadError(false)
-      putCachedSamples(res.data)
+      putCachedSamples(res.data.samples)
       // This 6s poll succeeding is proof of connectivity -- the natural,
       // already-recurring trigger to flush anything queued while offline.
       runSyncPass().catch(() => { /* best-effort; failures just leave items queued */ })

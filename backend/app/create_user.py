@@ -12,7 +12,8 @@ forgotten password later.
 """
 import getpass
 
-from app.db import Base, SessionLocal, engine
+from app.db import SessionLocal, engine
+from app.db_migrate import run_migrations
 from app.models.models import AuditEvent, User
 from app.services.auth_service import hash_password
 
@@ -29,7 +30,13 @@ def prompt_role() -> str:
 
 
 def main():
-    Base.metadata.create_all(bind=engine)
+    # B1 (Review #2 remediation): run_migrations(), not create_all() -- see
+    # seed.py's run() for the full explanation. Both of this app's two
+    # schema-creation call sites outside main.py's own startup must go
+    # through the same Alembic-driven path so a fresh install (which runs
+    # this script right after `seed.py --config-only`, per
+    # first_time_setup.bat) never has a schema with no alembic_version row.
+    run_migrations(engine)
     db = SessionLocal()
     try:
         print("=== CableLIMS -- create or update a login ===")

@@ -40,6 +40,18 @@ ALEMBIC_INI = BACKEND_DIR / "alembic.ini"
 # definition, sitting at exactly this point and needs stamping, not replay.
 BASELINE_REVISION = "69eb6322f401"
 
+# B1 (Review #2 remediation): the most recent migration's own column
+# addition -- used as a HEAD-shaped-schema fingerprint, see
+# _is_already_at_head() below. seed.py and create_user.py no longer call
+# Base.metadata.create_all() (that was the root cause -- see their own
+# comments), so no *new* create_all()-built database can appear after this
+# fix; this fingerprint only needs to recognize the shape of one that was
+# already built before this fix shipped. If create_all() is ever
+# reintroduced against the app's real engine, point this at whatever the
+# latest migration adds at that time.
+_HEAD_FINGERPRINT_TABLE = "test_runs"
+_HEAD_FINGERPRINT_COLUMN = "client_request_id"
+
 
 def _alembic_config(engine: Engine) -> Config:
     cfg = Config(str(ALEMBIC_INI))
@@ -56,6 +68,28 @@ def _alembic_config(engine: Engine) -> Config:
     return cfg
 
 
+def _is_already_at_head(inspector) -> bool:
+    """True if a database with no alembic_version table already has the
+    schema HEAD describes, rather than genuinely predating Alembic.
+
+    B1 (Review #2 remediation): the "users table but no alembic_version"
+    signal used below is ambiguous on its own -- it's equally true of (a) a
+    genuinely pre-Alembic database (the baseline schema shape, predating
+    every migration -- the case this heuristic was originally written for)
+    and (b) a database built via Base.metadata.create_all(), which builds
+    TODAY'S full model schema, i.e. always exactly HEAD, never baseline.
+    Blindly assuming (a) for both -- stamping baseline and replaying every
+    migration -- is exactly what made a fresh install 100% unable to boot
+    (see seed.py/create_user.py): the replay tried to CREATE INDEX on
+    indexes a HEAD-shaped database already had. Checking for a HEAD-only
+    artifact resolves the ambiguity directly instead of guessing.
+    """
+    if _HEAD_FINGERPRINT_TABLE not in inspector.get_table_names():
+        return False
+    columns = {c["name"] for c in inspector.get_columns(_HEAD_FINGERPRINT_TABLE)}
+    return _HEAD_FINGERPRINT_COLUMN in columns
+
+
 def run_migrations(engine: Engine) -> str:
     """Brings the database to the latest schema. Returns a short message
     describing what happened, for the caller to log."""
@@ -66,8 +100,13 @@ def run_migrations(engine: Engine) -> str:
     cfg = _alembic_config(engine)
     message = "Database schema is up to date."
     if is_pre_alembic_install:
-        command.stamp(cfg, BASELINE_REVISION)
-        message = f"Existing pre-Alembic database detected; stamped at baseline revision {BASELINE_REVISION}."
+        if _is_already_at_head(inspector):
+            command.stamp(cfg, "head")
+            message = ("Existing database already matched the head schema (built via "
+                       "create_all(), not genuinely pre-Alembic); stamped at head directly.")
+        else:
+            command.stamp(cfg, BASELINE_REVISION)
+            message = f"Existing pre-Alembic database detected; stamped at baseline revision {BASELINE_REVISION}."
 
     command.upgrade(cfg, "head")
     return message

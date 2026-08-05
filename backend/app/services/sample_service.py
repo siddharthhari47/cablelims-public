@@ -10,14 +10,19 @@ rewrite.
 """
 import os
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from fastapi import HTTPException, UploadFile
 from pydantic import BaseModel, ValidationError
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
-from app.engines.aggregation import overall_decision_from_summary, summarize_sample, summarize_samples_bulk
+from app.engines.aggregation import (
+    overall_decision_from_summary,
+    pick_accepted_run,
+    summarize_sample,
+    summarize_samples_bulk,
+)
 from app.engines.calculation_engine import run_calculation
 from app.engines.confidence_engine import evaluate as confidence_evaluate
 from app.engines.reading_schemas import get_reading_schema
@@ -112,12 +117,27 @@ class CreateSampleRequest(BaseModel):
 
 
 class ProfileRequest(BaseModel):
-    conductor_material: str
-    conductor_class: Optional[str] = None
-    insulation_type: str
+    # B8 (Review #2 remediation): these six fields used to be bare `str`,
+    # so a typo or wrong casing could reach the SKB lookups below unnoticed.
+    # Five (everything but conductor_material) fail safe on a bad value --
+    # standards_service.get_insulation_limit/get_sheath_limit return
+    # "MISSING" for an unrecognized key, and an unrecognized fire_category
+    # just means no fire-performance tests get assigned -- so the previous
+    # risk there was an avoidable UNDETERMINED, not a wrong answer.
+    # conductor_material is the one genuinely dangerous case:
+    # get_conductor_resistance_limit does `"copper_plain" if material ==
+    # "Copper" else "aluminium"` -- any value that isn't exactly "Copper"
+    # (a typo, different casing) silently resolves to the ALUMINIUM
+    # resistance table instead of failing safe, which is a wrong answer,
+    # not a missing one. Literal[...] closes all six at the API boundary,
+    # with the exact key sets verified against skb_seed_data.py and
+    # seed.py's rule conditions, not guessed.
+    conductor_material: Literal["Copper", "Aluminium"]
+    conductor_class: Optional[Literal["1", "2", "5", "6"]] = None
+    insulation_type: Literal["A", "B", "C", "D"]
     insulation_material: Optional[str] = "PVC"
-    sheath_type: Optional[str] = None
-    fire_category: str
+    sheath_type: Optional[Literal["ST1", "ST2", "ST3"]] = None
+    fire_category: Literal["01", "02", "FR", "FR-LSH"]
     construction: Optional[str] = None
     # Explicit per-core colour assignment, one entry per tested core, in
     # physical-position order -- e.g. ["RED","BLUE","YELLOW"]. Required:
@@ -131,7 +151,7 @@ class ProfileRequest(BaseModel):
     armour_type: Optional[str] = None
     armour_material: Optional[str] = None
     armour_strand_count: Optional[int] = None
-    cable_shape: Optional[str] = "Round"          # Round | Flat
+    cable_shape: Optional[Literal["Round", "Flat"]] = "Round"
     overall_diameter_mm: Optional[float] = None    # OD -- measured with calipers
     diameter_under_sheath_mm: Optional[float] = None  # ID -- over laid-up cores, before outer sheath
 
@@ -158,13 +178,23 @@ class ReviewRequest(BaseModel):
     comment: Optional[str] = None
 
 
-def list_samples(db: Session, user: User, status_filter: Optional[str]) -> List[dict]:
+def list_samples(db: Session, user: User, status_filter: Optional[str],
+                  limit: int = 200, offset: int = 0) -> dict:
+    # B7 (Review #2 remediation): limit/offset pagination, matching
+    # GET /api/admin/audit's existing convention (same clamping, same
+    # {total, ...} response shape) -- this app's one pagination pattern,
+    # not a second, differently-shaped one. Default limit (200) is
+    # comfortably above any realistic single-lab sample count today, so
+    # this is additive capacity rather than a behavior change for current
+    # data volumes, while genuinely capping unbounded future growth.
+    limit = min(max(limit, 1), 500)
     q = db.query(Sample)
     if user.role == "SCIENTIFIC_ASSISTANT":
         q = q.filter(Sample.assigned_assistant_id == user.id)
     if status_filter:
         q = q.filter(Sample.status == status_filter)
-    samples = q.order_by(Sample.created_at.desc()).all()
+    total = q.count()
+    samples = q.order_by(Sample.created_at.desc()).offset(offset).limit(limit).all()
     # H5: one bulk aggregation pass for every sample on this page, instead
     # of summarize_sample() once per sample (which itself used to query per
     # assigned test) -- was O(samples x tests) queries on every list load.
@@ -179,7 +209,7 @@ def list_samples(db: Session, user: User, status_filter: Optional[str]) -> List[
             "last_review_comment": s.last_review_comment,
             "summary": vars(summaries[s.sample_id]),
         })
-    return out
+    return {"total": total, "samples": out}
 
 
 def create_sample(db: Session, user: User, body: CreateSampleRequest) -> dict:
@@ -222,12 +252,44 @@ def create_sample(db: Session, user: User, body: CreateSampleRequest) -> dict:
 
 
 def get_sample_detail(db: Session, sample: Sample) -> dict:
+    # B7 (Review #2 remediation): this used to loop every AssignedTest
+    # issuing get_accepted_run() (1-2 queries), a separate .count() for
+    # attempts, and a lazy test_definition load each -- measured at 241
+    # queries for a 76-test sample. Fixed the same way H5 fixed the
+    # list/dashboard endpoints: one query for every assigned test (with its
+    # test_definition eager-loaded), one query for every run those tests
+    # have (with the three user relationships each run's response needs
+    # eager-loaded too), then the same per-test resolution
+    # (aggregation.pick_accepted_run) run entirely in memory.
     sample_id = sample.sample_id
     summary = summarize_sample(db, sample_id, sample.status)
     clause_refs = clause_references(db, sample.standard_id) if sample.standard_id else {}
+
+    assigned = (
+        db.query(AssignedTest)
+        .options(joinedload(AssignedTest.test_definition))
+        .filter(AssignedTest.sample_id == sample_id)
+        .all()
+    )
+    runs_by_assigned_test: dict = {}
+    assigned_ids = [at.id for at in assigned]
+    if assigned_ids:
+        for run in (
+            db.query(TestRun)
+            .filter(TestRun.assigned_test_id.in_(assigned_ids))
+            .options(
+                joinedload(TestRun.submitted_by),
+                joinedload(TestRun.overridden_by),
+                joinedload(TestRun.verified_by),
+            )
+            .all()
+        ):
+            runs_by_assigned_test.setdefault(run.assigned_test_id, []).append(run)
+
     tests = []
-    for at in db.query(AssignedTest).filter(AssignedTest.sample_id == sample_id).all():
-        latest = get_accepted_run(db, at)
+    for at in assigned:
+        candidate_runs = runs_by_assigned_test.get(at.id, [])
+        latest = pick_accepted_run(at, candidate_runs)
         procedure = get_procedure_note(at.test_id)
         tests.append({
             "assigned_test_id": at.id, "test_id": at.test_id,
@@ -243,7 +305,7 @@ def get_sample_detail(db: Session, sample: Sample) -> dict:
             "core_position": at.core_position,
             "_sequence": at.test_definition.sequence if at.test_definition else 999,
             "mandatory": at.mandatory, "enabled": at.enabled, "status": at.status,
-            "attempts": db.query(TestRun).filter(TestRun.assigned_test_id == at.id).count(),
+            "attempts": len(candidate_runs),
             "latest_result": None if not latest else {
                 "attempt_number": latest.attempt_number, "raw_values": latest.raw_values,
                 "calculated_value": latest.calculated_value, "calculated_unit": latest.calculated_unit,

@@ -59,7 +59,9 @@ def client(tmp_path):
         "TEST-0001": "Conductor Resistance",
         "TEST-0002": "Insulation Thickness",
         "TEST-0004": "Elongation at Break",
+        "TEST-0009": "Halogen Acid Gas",
         "TEST-0012": "Tensile Test (Aluminium Conductor)",
+        "TEST-0018": "Shrinkage Test",
         "TEST-0019": "Heat Shock Test",
     }
     assigned = {}
@@ -179,6 +181,41 @@ def test_elongation_final_shorter_than_initial_is_rejected(client):
 def test_valid_elongation_reading_still_succeeds(client):
     token = _token(client)
     resp = _submit(client, token, "TEST-0004", {"initial_length_mm": 25, "final_length_mm": 68})
+    assert resp.status_code == 200
+
+
+def test_shrinkage_specimen_growing_is_rejected(client):
+    # B11 (Review #2 remediation): length_after_mm > length_before_mm is a
+    # swapped-field error (a specimen doesn't grow under this test), not a
+    # real reading -- would otherwise sail through a "<=" limit as a
+    # comfortable, wrong PASS via a negative shrinkage percentage.
+    token = _token(client)
+    resp = _submit(client, token, "TEST-0018", {"length_before_mm": 50, "length_after_mm": 52})
+    assert resp.status_code == 422
+
+
+def test_valid_shrinkage_reading_still_succeeds(client):
+    token = _token(client)
+    resp = _submit(client, token, "TEST-0018", {"length_before_mm": 50, "length_after_mm": 48})
+    assert resp.status_code == 200
+
+
+def test_halogen_acid_gas_a_exceeding_b_is_rejected(client):
+    # B11 (Review #2 remediation): calc_halogen_acid_gas computes HCl%
+    # proportional to (B - A) -- titration_a_ml > titration_b_ml yields a
+    # negative HCl%, an impossible physical result.
+    token = _token(client)
+    resp = _submit(client, token, "TEST-0009", {
+        "sample_weight_g": 1.0, "titration_b_ml": 10.0, "titration_a_ml": 12.0, "titration_factor": 1.0,
+    })
+    assert resp.status_code == 422
+
+
+def test_valid_halogen_acid_gas_reading_still_succeeds(client):
+    token = _token(client)
+    resp = _submit(client, token, "TEST-0009", {
+        "sample_weight_g": 1.0, "titration_b_ml": 12.0, "titration_a_ml": 10.0, "titration_factor": 1.0,
+    })
     assert resp.status_code == 200
 
 

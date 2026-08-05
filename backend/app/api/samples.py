@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Depends, File, UploadFile
 from fastapi.responses import FileResponse
@@ -16,7 +16,7 @@ from app.schemas.samples import (
     ProfileSubmitResponse,
     ReviewResponse,
     SampleDetailOut,
-    SampleListItem,
+    SampleListResponse,
     SubmitReadingResponse,
 )
 from app.services import sample_service as svc
@@ -35,9 +35,10 @@ router = APIRouter(prefix="/api/samples", tags=["samples"])
 # entries, commits) lives in that module now.
 
 
-@router.get("", response_model=List[SampleListItem])
-def list_samples(db: Session = Depends(get_db), user: User = Depends(get_current_user), status_filter: Optional[str] = None):
-    return svc.list_samples(db, user, status_filter)
+@router.get("", response_model=SampleListResponse)
+def list_samples(db: Session = Depends(get_db), user: User = Depends(get_current_user), status_filter: Optional[str] = None,
+                  limit: int = 200, offset: int = 0):
+    return svc.list_samples(db, user, status_filter, limit, offset)
 
 
 @router.post("", response_model=CreateSampleResponse)

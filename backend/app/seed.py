@@ -13,7 +13,8 @@ import os
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict
 
-from app.db import Base, SessionLocal, engine
+from app.db import SessionLocal, engine
+from app.db_migrate import run_migrations
 from app.engines.aggregation import overall_decision_from_summary, summarize_sample
 from app.engines.calculation_engine import run_calculation
 from app.engines.confidence_engine import evaluate as confidence_evaluate
@@ -489,7 +490,22 @@ def run(config_only: bool = False):
     enough to put demo1234/ADMINISTRATOR on a production box. Set it in your
     own local shell/`.env` for day-to-day development; a fresh server clone
     that has never heard of this variable stays safe by default."""
-    Base.metadata.create_all(bind=engine)
+    # B1 (Review #2 remediation): this used to be Base.metadata.create_all(),
+    # which builds today's full model schema with no alembic_version row --
+    # on a fresh install that made db_migrate.run_migrations()'s "pre-Alembic
+    # database" heuristic misclassify the database as sitting at the OLD
+    # baseline schema (it only checks "has a users table but no
+    # alembic_version table"), stamp it there, and then try to replay
+    # migrations whose changes already existed -- a 100%-reproducible crash
+    # on every fresh install, since first_time_setup.bat runs this before
+    # the app ever boots. run_migrations() is the single schema-creation
+    # mechanism everywhere else (main.py's own startup); using it here too
+    # means a fresh install always builds its schema via Alembic from empty,
+    # which stamps alembic_version correctly the first time -- there is no
+    # window left in which this misclassification can occur for a new
+    # install. See db_migrate.py's own hardening for the defense-in-depth
+    # half of this fix.
+    run_migrations(engine)
     db = SessionLocal()
     try:
         standard = seed_standard(db)

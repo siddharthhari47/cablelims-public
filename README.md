@@ -1,8 +1,9 @@
 # CableLIMS — MVP Demonstration Build
 
 A working demonstration of the CableLIMS vision: Scientist desktop console + Scientific Assistant
-mobile workflow, a real rule/confidence engine, and PDF certificate generation — scoped to the
-Cable product family under IS 694, per `CableLIMS_SDD_v2.md` and `CableLIMS_Roadmap_v2.md`.
+mobile workflow, a real rule/confidence engine, and Test Report generation (a filled `.docx`, not
+a PDF — see below) — scoped to the Cable product family under IS 694, per `CableLIMS_SDD_v2.md`
+and `CableLIMS_Roadmap_v2.md`.
 
 **What's real vs. placeholder:** Conductor resistance (IS 8130 Table 2 + Table 6), insulation
 thickness (IS 694 Table 5), and the qualitative fire/HV tests are backed by verified BIS values
@@ -26,7 +27,7 @@ serving stale code after a file change without visibly failing. If you edit back
 this process fully (Ctrl+C, confirm no leftover `python.exe` in Task Manager) and start it again.)
 (First time only, or to reset to clean demo data: `venv\Scripts\python -m app.seed` — safe to
 re-run, wipes nothing but adds nothing twice. To fully reset: delete `backend/data/cablelims.db*`
-and `backend/certificates/*.pdf`, then re-run the seed command.)
+and `backend/certificates/*.docx`, then re-run the seed command.)
 
 **Terminal 2 — frontend:**
 ```
@@ -38,13 +39,14 @@ window, maximized). The terminal also prints a **Network** URL (e.g.
 `http://192.168.x.x:5173`) — open that same URL on a phone connected to the same Wi-Fi/LAN to
 demo the Scientific Assistant mobile experience for real, including camera capture.
 
-## Demo accounts (password `demo1234` for all)
+## Demo accounts
 
-| Username | Role | Use for |
-|---|---|---|
-| `scientist1` | Scientist | Desktop console — register samples, review, approve, generate certificates |
-| `assistant1` | Scientific Assistant | Phone — profile capture, test entry |
-| `admin1` | Administrator | Exists for the role model; no dedicated screens in this MVP |
+Running with `CABLELIMS_ALLOW_DEMO_USERS=1` set (see `backend/app/seed.py`) seeds three accounts
+— a Scientist, a Scientific Assistant, and an Administrator — and the login page's own "Demo
+accounts" hint shows their usernames and shared password once you're actually running it (B6,
+Review #2 remediation: not printed here, so this file isn't itself a list of working credentials
+for anyone who clones the repo — see `GET /api/auth/demo-hint` for how the login page decides
+whether to show it).
 
 ## Suggested walkthrough (under 5 minutes)
 
@@ -75,8 +77,12 @@ demo the Scientific Assistant mobile experience for real, including camera captu
    updates live, showing the confidence score and exactly which tests need Scientist attention
    and why (placeholder limit / no criterion yet / borderline result — each is labelled
    differently, not lumped together).
-7. **Approve**, then **Generate Certificate**, then **Download Certificate** — a professional
-   PDF with a QR code, full test table, and the overall decision.
+7. **Approve**, then **Generate Certificate**, then **Download Certificate** — the actual
+   `Test Report_694.docx` template (see `backend/app/report_templates/`), filled with this
+   sample's own data: full test table, limits, and the overall decision, plus a
+   [Download Observation Sheet] alongside it. Not a PDF, and no QR code — H21 removed both
+   (`report_engine.py`, `reportlab`, `qrcode`) in favor of filling CTL's real, existing template
+   directly, which is what an assessor or client actually expects to receive.
 
 ## Architecture notes for anyone reading the code
 
@@ -93,3 +99,19 @@ demo the Scientific Assistant mobile experience for real, including camera captu
 - Full architecture reasoning, the verified BIS standards catalog, and the production roadmap
   (multi-product-family support, offline sync, calibration tracking, etc.) live in
   `CableLIMS_SDD_v2.md` and `CableLIMS_Roadmap_v2.md` at the project root.
+
+## Running the tests
+
+Double-click `run_tests.bat` (repo root), or from a terminal:
+```
+cd cablelims/backend
+venv\Scripts\python -m pytest tests/ --cov=app --cov-report=term-missing --cov-fail-under=80
+```
+This is the same suite comments elsewhere in this codebase reference ("proven by the golden-value
+test suite", `login_throttle.py`'s `reset_all()` docstring, etc.) — it ships with every package
+(see `package_for_handoff.ps1`), so that's something you can verify yourself rather than take on
+trust. Currently: **300+ tests, 80%+ line coverage** (`--cov-fail-under=80` fails the run if that
+drops — raise this deliberately as coverage improves, don't let it silently regress). Covers every
+calculation engine against BIS-verified golden values, every C1–C19/H1–H22/B1–B12 security and
+correctness fix with its own regression test, and (B2) a clean-room reproduction of the documented
+first-time install.

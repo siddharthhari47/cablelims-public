@@ -1,8 +1,8 @@
 import { createTheme, type MantineColorsTuple } from '@mantine/core'
 
-// Navy/accent palette matched to the PDF certificate generator
-// (backend/app/engines/report_engine.py) so the on-screen product and the
-// printed certificate feel like the same system.
+// Navy/accent palette matched to the Test Report_694.docx template
+// (backend/app/services/docx_report_filler.py) so the on-screen product and
+// the generated report feel like the same system.
 const navy: MantineColorsTuple = [
   '#eef2fb', '#dbe4f5', '#b3c5e8', '#89a5da', '#6690d0', '#4f7fc9',
   '#4278c8', '#3468b1', '#2a5a9d', '#1b3f78',

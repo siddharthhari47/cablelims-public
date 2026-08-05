@@ -58,6 +58,15 @@ Copy-Item (Join-Path $root "backend\alembic.ini") $backendOut
 # operator creates one, stays on their machine, same as backend\data\.
 Copy-Item (Join-Path $root "backend\.env.example") $backendOut
 
+# B3 (Review #2 remediation): the test suite existed all along but never
+# shipped in the package -- a comment saying "proven by the golden-value
+# test suite" is not evidence if the recipient has no suite to run. tests/
+# and requirements-dev.txt are code, not data, same category as app\ above.
+Copy-Item (Join-Path $root "backend\tests") (Join-Path $backendOut "tests") -Recurse -Exclude "__pycache__"
+Get-ChildItem -Path (Join-Path $backendOut "tests") -Recurse -Filter "__pycache__" -Directory | Remove-Item -Recurse -Force
+Get-ChildItem -Path (Join-Path $backendOut "tests") -Recurse -Filter "*.pyc" | Remove-Item -Force
+Copy-Item (Join-Path $root "backend\requirements-dev.txt") $backendOut
+
 Write-Host "=== Copying built frontend ===" -ForegroundColor Cyan
 Copy-Item (Join-Path $root "frontend\dist") (Join-Path $outDir "frontend\dist") -Recurse
 
@@ -65,10 +74,17 @@ Write-Host "=== Copying launchers and docs ===" -ForegroundColor Cyan
 Copy-Item (Join-Path $root "start_cablelims.bat") $outDir
 Copy-Item (Join-Path $root "first_time_setup.bat") $outDir
 Copy-Item (Join-Path $root "backup_now.bat") $outDir
-foreach ($doc in @("README.md", "DEPLOYMENT.md", "SELF_HOST_GUIDE.md", "UPDATING.md")) {
+Copy-Item (Join-Path $root "run_tests.bat") $outDir
+foreach ($doc in @("README.md", "DEPLOYMENT.md", "SELF_HOST_GUIDE.md", "UPDATING.md", "CableLIMS_SDD_v2.md")) {
     $p = Join-Path $root $doc
     if (Test-Path $p) { Copy-Item $p $outDir }
 }
+
+# B4 (Review #2 remediation): the Caddyfile template DEPLOYMENT.md step 7
+# has the operator copy and edit -- not data-bearing (no secrets, no
+# machine-specific values beyond the one placeholder address the operator
+# fills in themselves), same category as everything else copied above.
+Copy-Item (Join-Path $root "deploy") (Join-Path $outDir "deploy") -Recurse
 
 Write-Host "=== Zipping ===" -ForegroundColor Cyan
 Compress-Archive -Path "$outDir\*" -DestinationPath $zipPath -Force

@@ -24,7 +24,7 @@ class SampleDecisionSummary:
     overall_status: str = "IN_PROGRESS"
 
 
-def _pick_accepted_run(assigned_test: AssignedTest, candidate_runs: List[TestRun]) -> Optional[TestRun]:
+def pick_accepted_run(assigned_test: AssignedTest, candidate_runs: List[TestRun]) -> Optional[TestRun]:
     """Same resolution rule as engines.result_utils.get_accepted_run (prefer
     accepted_attempt_id when set, otherwise the highest attempt_number), but
     operating on an already-fetched list of this assigned test's runs
@@ -39,7 +39,12 @@ def _pick_accepted_run(assigned_test: AssignedTest, candidate_runs: List[TestRun
     two implementations are intentionally duplicated in miniature rather
     than forcing get_accepted_run's per-call query pattern to change for a
     problem (N+1 across samples) it isn't the one causing -- see H5's
-    Phase 8 report."""
+    Phase 8 report.
+
+    B7 (Review #2 remediation): public (no leading underscore) because
+    sample_service.get_sample_detail now reuses it too, for the same
+    N+1 reason -- one shared "which run counts" rule, used everywhere a
+    caller already has runs pre-fetched instead of resolving per-test."""
     if assigned_test.accepted_attempt_id:
         for run in candidate_runs:
             if run.id == assigned_test.accepted_attempt_id:
@@ -61,7 +66,7 @@ def _summarize(
     confidences = []
 
     for at in assigned:
-        latest = _pick_accepted_run(at, runs_by_assigned_test.get(at.id, []))
+        latest = pick_accepted_run(at, runs_by_assigned_test.get(at.id, []))
         result = effective_result(latest)
         if not latest or result == "PENDING":
             continue

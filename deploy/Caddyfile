@@ -1,0 +1,43 @@
+# CableLIMS reverse proxy -- terminates HTTPS in front of the app (see
+# DEPLOYMENT.md step 7). Copy this file next to caddy.exe and edit the one
+# placeholder below before running it.
+#
+# Why a static address instead of Caddy's "on-demand TLS" (which would
+# issue a certificate for whatever hostname a client asks for, without
+# editing this file at all): on-demand TLS needs its own permission-check
+# configuration to avoid being a cert-issuance-abuse vector, which only
+# matters for a server reachable from the open internet. This is a LAN-only
+# appliance reached by a small, known set of lab devices at one fixed
+# address (DEPLOYMENT.md step 1 already has you get a static IP or DHCP
+# reservation for exactly this reason) -- a static site block naming that
+# one address is simpler and has nothing extra to configure or secure.
+#
+# Why `tls internal` (Caddy's own local CA) rather than a real
+# publicly-trusted certificate (Let's Encrypt etc.): those require a public
+# domain name Caddy can prove control of via a DNS or HTTP challenge --
+# there isn't one here, this server only has a private LAN IP. `tls
+# internal` is the standard answer for exactly this shape of deployment.
+# The one operational cost is that each lab device needs Caddy's root
+# certificate installed once to avoid a browser warning -- see
+# DEPLOYMENT.md step 7 for how.
+
+# EDIT THIS: replace with this server's actual LAN IP or hostname (the one
+# you looked up with `ipconfig` and got a static IP / DHCP reservation for).
+192.168.1.50, localhost {
+	tls internal
+	reverse_proxy 127.0.0.1:8000
+
+	# B4 (Review #2 remediation): tell browsers to always use HTTPS for this
+	# address from now on, even if someone types the bare http:// address or
+	# an old bookmark. max-age is 1 year -- long, deliberately: HSTS's whole
+	# value is that it protects the very first connection attempt too, which
+	# a short max-age would keep re-exposing.
+	header Strict-Transport-Security "max-age=31536000"
+}
+
+# Plain HTTP on the same address redirects to HTTPS, rather than serving
+# anything -- so a bookmark or typed address without "https://" still ends
+# up secure instead of silently staying on cleartext port 80.
+http://192.168.1.50, http://localhost {
+	redir https://{host}{uri} permanent
+}

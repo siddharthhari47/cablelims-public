@@ -125,7 +125,9 @@ def test_return_comment_persists_and_is_visible_to_the_assistant(client):
     assert detail["status"] == "TESTING"
     assert detail["last_review_comment"] == expected
 
-    listing = client.get("/api/samples", headers=_auth(asst_token)).json()
+    # B7 (Review #2 remediation): GET /api/samples now returns
+    # {total, samples} (pagination), not a bare array.
+    listing = client.get("/api/samples", headers=_auth(asst_token)).json()["samples"]
     row = next(s for s in listing if s["sample_id"] == client.sample_id)
     assert row["last_review_comment"] == expected
 

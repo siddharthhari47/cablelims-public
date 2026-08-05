@@ -64,6 +64,14 @@ class SampleListItem(BaseModel):
     summary: SampleSummary
 
 
+class SampleListResponse(BaseModel):
+    # B7 (Review #2 remediation): pagination, matching the limit/offset +
+    # {total, ...} shape GET /api/admin/audit already established -- one
+    # pagination convention in this app, not two.
+    total: int
+    samples: List[SampleListItem]
+
+
 class CreateSampleResponse(BaseModel):
     sample_id: str
     status: str

@@ -177,6 +177,19 @@ class ShrinkageReading(_StrictReading):
     length_before_mm: float = Field(gt=0)
     length_after_mm: float = Field(gt=0)
 
+    @model_validator(mode="after")
+    def _length_does_not_grow(self):
+        # B11 (Review #2 remediation): unlike LossOfMassReading's genuine
+        # moisture-pickup case above, a specimen *growing* under the 150 C /
+        # 15 min shrinkage protocol is not a real physical reading -- it's a
+        # swapped-field data-entry error, exactly like ElongationReading's
+        # own guard above. Without this, length_after_mm > length_before_mm
+        # yields a negative shrinkage percentage, which sails through a
+        # "<=" limit as a comfortable, wrong PASS.
+        if self.length_after_mm > self.length_before_mm:
+            raise ValueError("length_after_mm cannot exceed length_before_mm (a specimen does not grow under this test)")
+        return self
+
 
 HeatShockReading = QualitativeCrackReading
 
@@ -207,6 +220,17 @@ class HalogenAcidGasReading(_StrictReading):
     titration_b_ml: float = Field(ge=0)
     titration_a_ml: float = Field(ge=0)
     titration_factor: float = Field(gt=0)
+
+    @model_validator(mode="after")
+    def _a_does_not_exceed_b(self):
+        # B11 (Review #2 remediation): calc_halogen_acid_gas computes
+        # HCl% proportional to (B - A) -- titration_a_ml > titration_b_ml
+        # yields a negative HCl%, an impossible physical result (a
+        # swapped-field data-entry error), which would otherwise sail
+        # through a "<=" limit as a comfortable, wrong PASS.
+        if self.titration_a_ml > self.titration_b_ml:
+            raise ValueError("titration_a_ml cannot exceed titration_b_ml (this would yield a negative HCl%)")
+        return self
 
 
 class TemperatureIndexReading(_StrictReading):

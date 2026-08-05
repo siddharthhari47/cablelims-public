@@ -19,13 +19,12 @@
 
 ## Using it from a phone (optional)
 
-If you want to try the mobile side of the app (the Scientific Assistant screens), the phone
-needs to be on the **same Wi-Fi network** as this PC:
-1. With the app running, open Command Prompt and type `ipconfig`, look for "IPv4 Address"
-   (something like `192.168.1.50`).
-2. On the phone's browser, go to `http://<that address>:8000` — e.g. `http://192.168.1.50:8000`.
-3. If it doesn't connect, Windows Firewall is the most likely reason — see the "Firewall" note
-   in `DEPLOYMENT.md` in this same folder for the two-minute fix.
+The app only listens on this PC itself (`http://localhost:8000`) — it isn't reachable from a
+phone or any other device out of the box, on purpose (usernames and passwords shouldn't cross
+your Wi-Fi in plain text). To let a phone reach it, follow **`DEPLOYMENT.md`**'s steps 7–8 in this
+same folder ("Add HTTPS (Caddy)" and "Let other devices on the lab network reach it") — it's a
+few extra minutes of one-time setup, after which your phone reaches the app over a normal
+`https://` address, the same as any other secure website.
 
 ## Adding more logins later
 

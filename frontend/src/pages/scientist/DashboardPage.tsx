@@ -21,7 +21,9 @@ export default function DashboardPage() {
   const load = useCallback(async () => {
     const [d, s] = await Promise.all([api.get('/dashboard'), api.get('/samples')])
     setDash(d.data)
-    setSamples(s.data)
+    // B7 (Review #2 remediation): GET /api/samples now returns
+    // {total, samples} (pagination) instead of a bare array.
+    setSamples(s.data.samples)
   }, [])
 
   useEffect(() => {

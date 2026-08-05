@@ -107,7 +107,8 @@ def test_sample_list_timestamps_carry_a_utc_offset(client):
     token = _token(client, "sci_tz")
     resp = client.get("/api/samples", headers=_auth(token))
     assert resp.status_code == 200
-    samples = resp.json()
+    # B7 (Review #2 remediation): {total, samples} (pagination), not a bare array.
+    samples = resp.json()["samples"]
     assert len(samples) >= 1
     for s in samples:
         assert _has_utc_offset(s["created_at"]), f"created_at missing UTC offset: {s['created_at']!r}"
