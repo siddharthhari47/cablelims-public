@@ -18,11 +18,21 @@ jobs:
   backend:
     name: Backend (lint, types, tests, coverage, security)
     runs-on: ubuntu-latest
+    # test_path_traversal.py asserts frontend/dist actually exists -- it's
+    # what proves the SPA catch-all route (and the traversal fix it guards)
+    # is even registered. Depend on frontend and pull down its already-built
+    # output rather than duplicating the npm build here.
+    needs: frontend
     defaults:
       run:
         working-directory: backend
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
 
       - uses: actions/setup-python@v5
         with:
