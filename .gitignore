@@ -1,0 +1,40 @@
+# Python
+backend/venv/
+backend/__pycache__/
+**/__pycache__/
+*.pyc
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/coverage.xml
+backend/.coverage
+backend/htmlcov/
+
+# Real data -- NEVER commit an install's actual database, secret key,
+# generated certificates, uploaded images, or logs. Every one of these is
+# either sensitive or specific to one install; demo/seed data is created
+# fresh by app.seed, not checked in.
+backend/data/
+backend/certificates/
+backend/uploads/
+backend/logs/
+
+# H14: a real install's actual configuration overrides (may include
+# CABLELIMS_SECRET_KEY or other install-specific values) -- .env.example is
+# the checked-in template; an operator's own backend/.env is never checked in.
+backend/.env
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+# vite-plugin-pwa's dev-mode service worker output (devOptions.enabled) --
+# generated, only exists while `npm run dev` is running, same category as dist/.
+frontend/dev-dist/
+
+# Packaged handoff builds (see package_for_handoff.ps1) -- generated
+# artifacts, not source.
+handoff_packages/
+
+# OS cruft
+.DS_Store
+Thumbs.db

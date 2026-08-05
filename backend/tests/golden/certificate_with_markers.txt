@@ -1,0 +1,448 @@
+3. General requirements (Section 1 of the IS:694-2010 specification)
+Specified
+Observed
+a.Conductor (Cl. 4.1)
+Copper
+Copper
+b.  Insulation (Cl. 5.1)
+
+Application to the Conductor (Cl. 5.2)
+PVC Type A
+
+Insulation shall be applied by extrusion by PVC compound.
+It shall fit closely to the conductor and shall be possible to remove the insulation without damage to the conductor.
+Type A
+
+PVC Insulation applied over the conductor by extrusion and found fit closely to the conductor. It is possible to remove it without damage to the conductor.
+c. Sheath (Cl. 8.1)
+PVC Type ST1
+Type ST1
+4.  Construction (Section 2, Cl.17 of the specification IS:694-2010)
+4.  Construction (Section 2, Cl.17 of the specification IS:694-2010)
+4.  Construction (Section 2, Cl.17 of the specification IS:694-2010)
+a. Conductor (Cl.17.1.1)
+Class 2 Conductor
+Class 2 Conductor
+b. Area of the conductor (Cl. 17.1.1.1)
+2.5 sq.mm. (Nominal)
+2.5 sq.mm (Calculated)
+
+
+Specified
+
+Observed
+Observed
+
+
+
+c.	Insulation (Cl.17.1.2)
+Insulation shall be applied by extrusion by PVC compound. It shall fit closely to the conductor and shall be possible to remove the insulation without damage to the conductor.
+Insulation shall be applied by extrusion by PVC compound. It shall fit closely to the conductor and shall be possible to remove the insulation without damage to the conductor.
+Insulation shall be applied by extrusion by PVC compound. It shall fit closely to the conductor and shall be possible to remove the insulation without damage to the conductor.
+PVC Insulation applied over the conductor by extrusion and found fit closely to the conductor. It is possible to remove it without damage to the conductor.
+PVC Insulation applied over the conductor by extrusion and found fit closely to the conductor. It is possible to remove it without damage to the conductor.
+PVC Insulation applied over the conductor by extrusion and found fit closely to the conductor. It is possible to remove it without damage to the conductor.
+d. Core identification (Cl. 12)
+Red, Black, Yellow, Blue, White, grey
+Red, Black, Yellow, Blue, White, grey
+Red, Black, Yellow, Blue, White, grey
+RED
+RED
+
+
+
+e.  Outer Sheath(Cl. 19.1.4)
+
+Sheath shall be Type ST3, It shall be applied by extrusion. The sheath may fill the space between the cores but it shall not adhere to the cores.
+
+Sheath shall be Type ST3, It shall be applied by extrusion. The sheath may fill the space between the cores but it shall not adhere to the cores.
+
+Sheath shall be Type ST3, It shall be applied by extrusion. The sheath may fill the space between the cores but it shall not adhere to the cores.
+Sheath is applied over the laid up cores by extrusion. The type of PVC compound is ST3 of black colour, applied by extrusion. The sheath filled the space between the cores but not adhere to the cores.
+Sheath is applied over the laid up cores by extrusion. The type of PVC compound is ST3 of black colour, applied by extrusion. The sheath filled the space between the cores but not adhere to the cores.
+Sheath is applied over the laid up cores by extrusion. The type of PVC compound is ST3 of black colour, applied by extrusion. The sheath filled the space between the cores but not adhere to the cores.
+5.Type Tests (Table 1, Sl. No.iii of IS:694-2010)
+
+
+5.Type Tests (Table 1, Sl. No.iii of IS:694-2010)
+
+
+
+Specified
+
+Observed
+
+
+a.  Test on Conductor
+Conductor resistance test (as per Table 1, Sl. No.iii .a.4 of IS:694-2010, IS: 8130 – 2013
+for class 5 Conductor & IS: 10810 (Part-5) - 1984)
+Resistance corrected to 20 °C in Ohm/km
+a.  Test on Conductor
+Conductor resistance test (as per Table 1, Sl. No.iii .a.4 of IS:694-2010, IS: 8130 – 2013
+for class 5 Conductor & IS: 10810 (Part-5) - 1984)
+Resistance corrected to 20 °C in Ohm/km
+
+Red
+Yellow
+Blue
+Black
+a.  Test on Conductor
+Conductor resistance test (as per Table 1, Sl. No.iii .a.4 of IS:694-2010, IS: 8130 – 2013
+for class 5 Conductor & IS: 10810 (Part-5) - 1984)
+Resistance corrected to 20 °C in Ohm/km
+a.  Test on Conductor
+Conductor resistance test (as per Table 1, Sl. No.iii .a.4 of IS:694-2010, IS: 8130 – 2013
+for class 5 Conductor & IS: 10810 (Part-5) - 1984)
+Resistance corrected to 20 °C in Ohm/km
+
+
+
+<= 5.0 (Max)
+
+
+
+3.500 [OVERRIDDEN]
+
+
+
+-
+
+
+
+-
+
+
+
+-
+b.  Test for overall dimensions and thickness of insulation & Sheath.
+(as per Table 1, Sl. No.iii.b and table 6 of IS: 694 - 2010 & IS: 10810 (Part-6) - 1984)
+b.  Test for overall dimensions and thickness of insulation & Sheath.
+(as per Table 1, Sl. No.iii.b and table 6 of IS: 694 - 2010 & IS: 10810 (Part-6) - 1984)
+b.  Test for overall dimensions and thickness of insulation & Sheath.
+(as per Table 1, Sl. No.iii.b and table 6 of IS: 694 - 2010 & IS: 10810 (Part-6) - 1984)
+b.  Test for overall dimensions and thickness of insulation & Sheath.
+(as per Table 1, Sl. No.iii.b and table 6 of IS: 694 - 2010 & IS: 10810 (Part-6) - 1984)
+b.  Test for overall dimensions and thickness of insulation & Sheath.
+(as per Table 1, Sl. No.iii.b and table 6 of IS: 694 - 2010 & IS: 10810 (Part-6) - 1984)
+b.  Test for overall dimensions and thickness of insulation & Sheath.
+(as per Table 1, Sl. No.iii.b and table 6 of IS: 694 - 2010 & IS: 10810 (Part-6) - 1984)
+b.  Test for overall dimensions and thickness of insulation & Sheath.
+(as per Table 1, Sl. No.iii.b and table 6 of IS: 694 - 2010 & IS: 10810 (Part-6) - 1984)
+i.  Average thickness of insulation in mm
+i.  Average thickness of insulation in mm
+0.8 (Nominal) [PLACEHOLDER LIMIT]
+0.85
+-
+-
+-
+ii.  Minimum thickness of insulation in mm
+ii.  Minimum thickness of insulation in mm
+-
+-
+-
+
+-
+-
+iii.  Overall diameter in mm
+
+-
+
+-
+
+
+iv.  Average thickness of sheath in mm
+
+-
+
+-
+
+
+v.  Minimum thickness of sheath in mm
+
+-
+
+-
+
+
+c. Physical Test on Insulation (Table 1, Sl. No.iii .c of IS:694-2010 and Table 1 of IS: 5831 - 1984)
+c. Physical Test on Insulation (Table 1, Sl. No.iii .c of IS:694-2010 and Table 1 of IS: 5831 - 1984)
+c. Physical Test on Insulation (Table 1, Sl. No.iii .c of IS:694-2010 and Table 1 of IS: 5831 - 1984)
+c. Physical Test on Insulation (Table 1, Sl. No.iii .c of IS:694-2010 and Table 1 of IS: 5831 - 1984)
+c. Physical Test on Insulation (Table 1, Sl. No.iii .c of IS:694-2010 and Table 1 of IS: 5831 - 1984)
+c. Physical Test on Insulation (Table 1, Sl. No.iii .c of IS:694-2010 and Table 1 of IS: 5831 - 1984)
+c. Physical Test on Insulation (Table 1, Sl. No.iii .c of IS:694-2010 and Table 1 of IS: 5831 - 1984)
+i. Tensile strength & elongation at break (as per Table 1, Sl. No.iii .c.1 and IS: 10810 (Part
+- 7) – 1984
+
+
+
+Observed
+
+
+i. Tensile strength & elongation at break (as per Table 1, Sl. No.iii .c.1 and IS: 10810 (Part
+- 7) – 1984
+Specified
+Specified
+
+
+
+Outer Sheath
+i. Tensile strength & elongation at break (as per Table 1, Sl. No.iii .c.1 and IS: 10810 (Part
+- 7) – 1984
+
+Red
+Yellow
+Blue
+Black
+Outer Sheath
+Tensile strength in N/mm²
+12.5 (Min)
+12.60 [UNDETERMINED]
+-
+-
+-
+-
+Elongation at break in percent
+-
+-
+-
+-
+-
+-
+ii. Loss of mass in mg/cm2 (as per IS:10810(Part-10)-1984 and Table 1, Sl. No.iii .c.2 of IS:694 -2010)
+
+
+-
+
+-
+
+-
+
+-
+
+-
+
+-
+iii. Ageing test (Sample kept at 80±2°C for 7 days) (as per IS: 10810 (Part - 11) – 1984 and Table 1, Sl. No.iii .c.3 of IS:694 -2010)
+iii. Ageing test (Sample kept at 80±2°C for 7 days) (as per IS: 10810 (Part - 11) – 1984 and Table 1, Sl. No.iii .c.3 of IS:694 -2010)
+iii. Ageing test (Sample kept at 80±2°C for 7 days) (as per IS: 10810 (Part - 11) – 1984 and Table 1, Sl. No.iii .c.3 of IS:694 -2010)
+iii. Ageing test (Sample kept at 80±2°C for 7 days) (as per IS: 10810 (Part - 11) – 1984 and Table 1, Sl. No.iii .c.3 of IS:694 -2010)
+iii. Ageing test (Sample kept at 80±2°C for 7 days) (as per IS: 10810 (Part - 11) – 1984 and Table 1, Sl. No.iii .c.3 of IS:694 -2010)
+iii. Ageing test (Sample kept at 80±2°C for 7 days) (as per IS: 10810 (Part - 11) – 1984 and Table 1, Sl. No.iii .c.3 of IS:694 -2010)
+iii. Ageing test (Sample kept at 80±2°C for 7 days) (as per IS: 10810 (Part - 11) – 1984 and Table 1, Sl. No.iii .c.3 of IS:694 -2010)
+Tensile strength in N/mm²
+12.50 (Min)
+-
+-
+-
+-
+-
+Elongation at break in percent
+-
+-
+-
+-
+-
+-
+Tensile strength variation in percent
+-
+-
+-
+-
+-
+-
+Elongation variation in percent
+-
+-
+-
+-
+-
+-
+iv. Shrinkage in % (Table 1, Sl. No.iii .c.4 of IS:694 -2010) (as per IS:10810(Part-12)-
+1984) (150±2°C for 15minutes)
+
+-
+
+-
+
+-
+
+-
+
+-
+
+-
+v.  Heat shock test (150±2°C for 1 hour)
+(as per Table 1, Sl. No.iii .c.5 of IS:694 -2010 and IS: 10810 (Part - 14) - 1984)
+Shall not show scales or cracks
+-
+-
+-
+-
+-
+vi.  Hot deformation test (80±2°C for 4 hours) ( Table 1, Sl. No.iii .c.6 of IS:694 -2010 & IS:10810 (Pt - 15) -1984)
+vi.  Hot deformation test (80±2°C for 4 hours) ( Table 1, Sl. No.iii .c.6 of IS:694 -2010 & IS:10810 (Pt - 15) -1984)
+vi.  Hot deformation test (80±2°C for 4 hours) ( Table 1, Sl. No.iii .c.6 of IS:694 -2010 & IS:10810 (Pt - 15) -1984)
+vi.  Hot deformation test (80±2°C for 4 hours) ( Table 1, Sl. No.iii .c.6 of IS:694 -2010 & IS:10810 (Pt - 15) -1984)
+vi.  Hot deformation test (80±2°C for 4 hours) ( Table 1, Sl. No.iii .c.6 of IS:694 -2010 & IS:10810 (Pt - 15) -1984)
+vi.  Hot deformation test (80±2°C for 4 hours) ( Table 1, Sl. No.iii .c.6 of IS:694 -2010 & IS:10810 (Pt - 15) -1984)
+vi.  Hot deformation test (80±2°C for 4 hours) ( Table 1, Sl. No.iii .c.6 of IS:694 -2010 & IS:10810 (Pt - 15) -1984)
+Depth of indentation in percent
+-
+-
+-
+-
+-
+-
+vii. Thermal Stability test (Table 1, Sl. No.iii .c.7 of IS:694 -2010and IS: 10810 (part – 60) – 1988)
+Thermal stability times in minutes
+For insulation -
+For sheath -
+
+
+
+-
+
+
+
+-
+
+
+
+-
+
+
+
+-
+
+
+
+-
+viii.  Flammability test (Table 1, Sl. No.iii .c.10 of IS:694 -2010 and IS: 10810 (part – 53) – 1984.
+viii.  Flammability test (Table 1, Sl. No.iii .c.10 of IS:694 -2010 and IS: 10810 (part – 53) – 1984.
+viii.  Flammability test (Table 1, Sl. No.iii .c.10 of IS:694 -2010 and IS: 10810 (part – 53) – 1984.
+i.  Period of burning after removal of the flame, seconds
+60 (Max)
+N/A (fire category 01)
+ii. Unaffected portion from the lower edge the top clamp, mm
+50 (Min)
+N/A (fire category 01)
+i. Oxygen Index Test (as per Cl. 10.5 of IS: 694 - 2010 & IS: 10810 (part - 58) - 1998)
+The Oxygen index, %
+
+
+29 (Min)
+
+
+N/A (fire category 01)
+ii. Test for halogen acid gas evaluation (as per Cl. 10.6of IS: 694 - 2010 & IS: 10810 (part - 59) - 1998)
+The level of HCL evolved in percent by weight
+
+
+20 (Max)
+
+
+N/A (fire category 01)
+iii. Test for Temperature Index(as per Cl. 10.7 of IS: 694 - 2010 & IS: 10810 (part - 64) - 1998)
+Temperature index in C at 21% of O2
+
+
+250 (Min)
+
+
+N/A (fire category 01)
+iv.  Smoke density rating
+(as per Cl. 10.8 of IS: 694 - 2010 & IS: 13360 (Part 6/Sec 9): 2001)
+Smoke density rating %
+
+60 % (Max) light absorption
+
+N/A (fire category 01)
+d.	Test on Completed Cable (Table 1, Sl. No.iii .e of IS:694-2010)
+d.	Test on Completed Cable (Table 1, Sl. No.iii .e of IS:694-2010)
+d.	Test on Completed Cable (Table 1, Sl. No.iii .e of IS:694-2010)
+1.  High voltage test (Water immersion test)(Table 1, Sl.No.iii.e.1 of IS:694-2010, cl.10 & IS:10810(pt-45)- 1984)
+1.  High voltage test (Water immersion test)(Table 1, Sl.No.iii.e.1 of IS:694-2010, cl.10 & IS:10810(pt-45)- 1984)
+1.  High voltage test (Water immersion test)(Table 1, Sl.No.iii.e.1 of IS:694-2010, cl.10 & IS:10810(pt-45)- 1984)
+ac test (as per Cl. 10.1 of IS: 694 - 2010 & IS: 10810 (part - 45) - 1984)
+ac test (as per Cl. 10.1 of IS: 694 - 2010 & IS: 10810 (part - 45) - 1984)
+ac test (as per Cl. 10.1 of IS: 694 - 2010 & IS: 10810 (part - 45) - 1984)
+The sample was kept in water at 60±3oC for 24 hrs. After
+
+
+-
+that an ac voltage of 3kV(rms) 50Hz was applied and raised to 6kV(rms) 50 Hz within 10seconds and kept for 5 minutes.
+Shall	withstand	the	test
+without breakdown or flash over.
+
+-
+dc test (as per Cl. 10.1 of IS: 694 - 2010 & IS: 10810 (part - 45) - 1984)
+dc test (as per Cl. 10.1 of IS: 694 - 2010 & IS: 10810 (part - 45) - 1984)
+dc test (as per Cl. 10.1 of IS: 694 - 2010 & IS: 10810 (part - 45) - 1984)
+After completion of ac test the sample was subsequently tested with dc voltage of 1.2 kV in the same water bath at same temperature for 240hours.
+Shall withstand the test without breakdown or flash over.
+-
+2. Insulation resistance test (as per Table 1, Sl.No.iii.e.2 of IS:694-2010, IS:5831 Table1 & IS:10810 (part-43)-1984)
+2. Insulation resistance test (as per Table 1, Sl.No.iii.e.2 of IS:694-2010, IS:5831 Table1 & IS:10810 (part-43)-1984)
+2. Insulation resistance test (as per Table 1, Sl.No.iii.e.2 of IS:694-2010, IS:5831 Table1 & IS:10810 (part-43)-1984)
+2. Insulation resistance test (as per Table 1, Sl.No.iii.e.2 of IS:694-2010, IS:5831 Table1 & IS:10810 (part-43)-1984)
+2. Insulation resistance test (as per Table 1, Sl.No.iii.e.2 of IS:694-2010, IS:5831 Table1 & IS:10810 (part-43)-1984)
+2. Insulation resistance test (as per Table 1, Sl.No.iii.e.2 of IS:694-2010, IS:5831 Table1 & IS:10810 (part-43)-1984)
+Volume resistivity in Ω Cm
+Specified
+
+Observed
+Observed
+
+
+
+Red
+Yellow
+Blue
+Black
+At Room temperature
+-
+-
+-
+-
+-
+At 70 °C
+1 X 109 (Min)
+-
+-
+-
+-
+Insulation resistance constant, MΩ.km
+
+
+
+
+
+At Room temperature
+-
+-
+-
+-
+-
+At 70 °C
+0.004 (Min)
+-
+-
+-
+-
+3. High voltage test (at room temperature) (as per Table 1, Sl. No.iii .e .3 and Cl. 10.2 of IS: 694 - 2010 & IS: 10810 (part - 45)-1984)
+3. High voltage test (at room temperature) (as per Table 1, Sl. No.iii .e .3 and Cl. 10.2 of IS: 694 - 2010 & IS: 10810 (part - 45)-1984)
+3. High voltage test (at room temperature) (as per Table 1, Sl. No.iii .e .3 and Cl. 10.2 of IS: 694 - 2010 & IS: 10810 (part - 45)-1984)
+3. High voltage test (at room temperature) (as per Table 1, Sl. No.iii .e .3 and Cl. 10.2 of IS: 694 - 2010 & IS: 10810 (part - 45)-1984)
+3. High voltage test (at room temperature) (as per Table 1, Sl. No.iii .e .3 and Cl. 10.2 of IS: 694 - 2010 & IS: 10810 (part - 45)-1984)
+3. High voltage test (at room temperature) (as per Table 1, Sl. No.iii .e .3 and Cl. 10.2 of IS: 694 - 2010 & IS: 10810 (part - 45)-1984)
+The sample was immersed in water at room temperature for one hour. After that an ac voltage of 3kV(rms) 50Hz was applied and kept for 5 minutes.
+Shall withstand without breakdown or flash over
+
+-
+
+-
+
+-
+
+-

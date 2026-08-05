@@ -1,0 +1,47 @@
+# Full resolved dependency tree for requirements.txt (direct AND
+# transitive), exactly pinned -- generated with `pip freeze` from a clean
+# venv containing nothing but requirements.txt's own install (H13).
+#
+# requirements.txt stays the file a developer edits by hand when adding,
+# removing, or bumping a dependency; this file is the reproducibility
+# guarantee on top of it -- two installs from THIS file always get
+# byte-identical dependency versions, including everything requirements.txt
+# doesn't pin directly (starlette, anyio, h11, click, ...), which could
+# otherwise drift silently if an upstream package loosens its own version
+# constraints later.
+#
+# Regenerate after editing requirements.txt:
+#   python -m venv /tmp/lockenv && /tmp/lockenv/Scripts/python -m pip install -r requirements.txt
+#   /tmp/lockenv/Scripts/python -m pip freeze > requirements.lock.txt
+# (a throwaway venv, not this project's real backend/venv, so nothing
+# already installed there -- ruff, mypy, dev tooling -- leaks into the lock)
+alembic==1.14.0
+annotated-types==0.8.0
+anyio==4.14.2
+bcrypt==5.0.0
+click==8.4.2
+colorama==0.4.6
+fastapi==0.115.6
+greenlet==3.5.4
+h11==0.16.0
+httptools==0.8.0
+idna==3.18
+lxml==6.1.1
+Mako==1.3.12
+MarkupSafe==3.0.3
+pillow==12.3.0
+pydantic==2.10.3
+pydantic-settings==2.14.2
+pydantic_core==2.27.1
+PyJWT==2.13.0
+python-docx==1.2.0
+python-dotenv==1.2.2
+python-multipart==0.0.32
+PyYAML==6.0.3
+SQLAlchemy==2.0.36
+starlette==0.41.3
+typing-inspection==0.4.2
+typing_extensions==4.16.0
+uvicorn==0.32.1
+watchfiles==1.2.0
+websockets==17.0.1

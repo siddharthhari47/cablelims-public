@@ -1,0 +1,71 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+# Core correctness (F, E9, W) plus a few genuinely high-value checks:
+# import hygiene (I), common-bug patterns (B), naive-datetime usage (DTZ),
+# and Ruff's own rules (RUF). Deliberately NOT enabling pyupgrade (UP):
+# this codebase consistently writes typing.Optional[X]/List[X] rather than
+# X | None / list[X] throughout every module -- rewriting every
+# annotation for a pure style preference would be a large, purely
+# cosmetic diff with zero functional benefit, exactly the kind of
+# "unnecessary rewrite" this project's coding standards caution against.
+# Also not enabling C408 (dict()-vs-{} preference) for the same reason.
+select = ["E4", "E7", "E9", "F", "W", "I", "B", "DTZ", "RUF"]
+ignore = [
+    "E501",  # line length -- this codebase's real style has long docstrings/comments; not worth the churn to wrap them
+    # FastAPI's entire dependency-injection pattern is `param: X =
+    # Depends(...)`, frequently `Depends(some_factory(...))` (see
+    # api/deps.py's require_roles/get_authorized_sample) -- a call, or a
+    # call producing another call, in a default argument by design, not a
+    # bug. This is the standard, documented Ruff exception for FastAPI
+    # projects; extend-immutable-calls only covers the outermost call, not
+    # the dependency-factory pattern this codebase uses throughout.
+    "B008",
+    # This codebase's procedure-note text (services/procedure_notes.py)
+    # deliberately renders worked-example formulas with real mathematical
+    # symbols (×, ÷) for Scientists/Assistants reading them in the UI --
+    # not obfuscation, not a security concern, just correct notation.
+    "RUF001",
+]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+# models.py uses SQLAlchemy's classic declarative style (Column(...)
+# class attributes), not the newer Mapped[]/mapped_column() style --
+# without this plugin, mypy sees every attribute's CLASS-level type
+# (Column[str]) and doesn't know it resolves to the plain instance-level
+# type (str) on an actual ORM object, producing hundreds of false
+# "Column[str] is not str" errors on ordinary attribute access/assignment
+# throughout the codebase. This is SQLAlchemy's own official fix for
+# exactly that gap -- not a workaround, and doesn't require migrating
+# models.py to Mapped[] syntax (a large, unnecessary rewrite of a
+# tested, working ORM layer).
+#
+# pydantic.mypy (H14): without it, mypy treats every Settings() field --
+# even ones with a Field(default, ...) -- as a required __init__ argument,
+# since it can't see that BaseSettings/BaseModel generates a permissive
+# __init__ from the field defaults at runtime. This is pydantic's own
+# official fix for that gap, the same pattern as the SQLAlchemy plugin above.
+plugins = ["sqlalchemy.ext.mypy.plugin", "pydantic.mypy"]
+# This codebase is written with light typing discipline (function params
+# typed inconsistently, dataclasses used more than strict Pydantic models
+# in the engine layer) -- strict mode would produce hundreds of findings
+# unrelated to actual bugs. Runs in permissive mode: still catches real
+# type errors (wrong argument types, unreachable code, etc.), doesn't
+# demand exhaustive annotation coverage that was never this project's style.
+check_untyped_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+# strict_optional off: this codebase's actual, established discipline is
+# runtime business-logic guarantees (e.g. "this is only None before a
+# profile is confirmed, and every call site here runs after that check"),
+# not static Optional-narrowing at every call site. With it on, SQLAlchemy
+# nullable columns and Optional-typed engine params flag ~90% of this
+# codebase's real, working code as "wrong" even though nothing here is
+# actually a bug -- turning it off matches mypy's checking to how this
+# project is genuinely written, rather than demanding a rewrite to a
+# discipline it was never built with.
+strict_optional = false

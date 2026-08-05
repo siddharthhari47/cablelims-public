@@ -1,0 +1,149 @@
+name: CI
+
+# Runs on push/PR against main. Three jobs, mirroring how this project is
+# actually structured: backend (Python) and frontend (TypeScript/React)
+# are independently lintable/testable, and build-verification is a final
+# smoke test that the two actually work together as a running app --
+# not just "the code compiles," but "the server starts and answers
+# requests," which none of the unit-level checks below can prove on
+# their own.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend (lint, types, tests, coverage, security)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: backend/requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Ruff (lint)
+        run: ruff check app/
+
+      - name: MyPy (type check)
+        run: mypy app/
+
+      - name: Pytest (with coverage)
+        # 80%, not 100%: real, current coverage is ~85%; this is a floor
+        # that catches a genuine regression (a large swath of untested new
+        # code) without being so tight it breaks on ordinary day-to-day
+        # fluctuation. Raise it deliberately as coverage improves, don't
+        # let it silently drift down.
+        run: pytest tests/ --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=80
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage.xml
+
+      - name: pip-audit (dependency vulnerabilities)
+        # H13 replaced python-jose (known CVEs, effectively unmaintained)
+        # with PyJWT and dropped passlib, clearing every finding pip-audit
+        # used to report except starlette (pulled in transitively by
+        # fastapi==0.115.6 -- fixing it needs a large FastAPI version
+        # bump with its own dedicated compatibility pass, tracked
+        # separately). --ignore-vuln entries below are each a specific,
+        # already-tracked, deliberately-deferred finding -- not a blanket
+        # exception. Remove each one as its underlying dependency is
+        # actually upgraded, never just to silence a new finding.
+        run: >
+          pip-audit -r requirements.lock.txt
+          --ignore-vuln PYSEC-2026-161
+          --ignore-vuln PYSEC-2026-248
+          --ignore-vuln PYSEC-2026-249
+          --ignore-vuln PYSEC-2026-1941
+          --ignore-vuln PYSEC-2026-1942
+          --ignore-vuln PYSEC-2026-2280
+          --ignore-vuln PYSEC-2026-2281
+
+  frontend:
+    name: Frontend (lint, typecheck, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build (tsc typecheck + vite build)
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+
+  build-verification:
+    name: Build verification (app actually starts and serves)
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: backend/requirements.lock.txt
+
+      # requirements.lock.txt (H13), not requirements.txt or
+      # requirements-dev.txt -- matches exactly what first_time_setup.bat
+      # installs on a real machine: the full pinned dependency tree, no
+      # CI-only tooling.
+      - name: Install backend dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.lock.txt
+
+      - name: Start the app and confirm it reports healthy
+        # A clean `pip install` + import isn't enough proof -- this starts
+        # the real ASGI app (runs Alembic migrations against a fresh
+        # SQLite file, exactly like a first-time install) and polls the
+        # actual health endpoint, the same one an operator's monitoring
+        # would hit.
+        working-directory: backend
+        run: |
+          python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          for i in $(seq 1 20); do
+            if curl -sf http://127.0.0.1:8000/api/health | grep -q '"status":\s*"ok"'; then
+              echo "App started and reported healthy."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "App did not become healthy within 20s."
+          exit 1
