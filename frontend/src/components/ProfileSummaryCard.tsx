@@ -73,6 +73,15 @@ export function ProfileSummaryCard(
           )}
         </Group>
       )}
+      {(profile.flat_width_mm != null || profile.flat_height_mm != null) && (
+        // IS 694 cl.22, Table 10 -- a flat cable's overall dimensions are
+        // reported as W x H, not a single diameter.
+        <Group gap="lg" mb="sm">
+          <Text size="xs" c="dimmed">
+            Overall Dimensions (W × H): <b>{profile.flat_width_mm ?? '?'} × {profile.flat_height_mm ?? '?'} mm</b>
+          </Text>
+        </Group>
+      )}
       {profile.hand_drawn_diagram_url ? (
         <Stack gap={4}>
           <Text size="xs" c="dimmed">Custom diagram uploaded (construction doesn't fit the standard parametric model).</Text>
@@ -96,6 +105,7 @@ export function ProfileSummaryCard(
           armourStrandCount={profile.armour_strand_count}
           hasOuterSheath={!!profile.has_outer_sheath}
           sheathType={profile.sheath_type}
+          cableShape={profile.cable_shape}
         />
       )}
     </Paper>

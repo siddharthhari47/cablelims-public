@@ -40,8 +40,13 @@ export interface CableProfile {
   armour_strand_count?: number | null
   hand_drawn_diagram_url?: string | null
   cable_shape?: 'Round' | 'Flat'
+  // Round only (IS 694 Table 5-7) -- a diameter isn't meaningful for a flat
+  // cross-section.
   overall_diameter_mm?: number | null
   diameter_under_sheath_mm?: number | null
+  // Flat only (IS 694 cl.22, Table 10 -- "Overall Dimensions, Max (W x H)").
+  flat_width_mm?: number | null
+  flat_height_mm?: number | null
 }
 
 export interface SampleSummary {

@@ -47,6 +47,11 @@ export function ConstructionProfileForm({ sampleId, coresTested, suggestedCoreCo
   const [cableShape, setCableShape] = useState<'Round' | 'Flat'>('Round')
   const [overallDiameter, setOverallDiameter] = useState<number | ''>('')
   const [diameterUnderSheath, setDiameterUnderSheath] = useState<number | ''>('')
+  // IS 694 cl.22, Table 10 -- a flat cable's overall dimensions are Width x
+  // Height, not a diameter. Genuinely different fields from OD/ID above,
+  // shown instead of them (not alongside) when Flat is selected.
+  const [flatWidth, setFlatWidth] = useState<number | ''>('')
+  const [flatHeight, setFlatHeight] = useState<number | ''>('')
 
   const [hasArmour, setHasArmour] = useState(false)
   const [hasInnerSheath, setHasInnerSheath] = useState(false)
@@ -125,8 +130,13 @@ export function ConstructionProfileForm({ sampleId, coresTested, suggestedCoreCo
       armour_material: hasArmour ? armourMaterial : null,
       armour_strand_count: hasArmour ? (armourStrandCount === '' ? null : armourStrandCount) : null,
       cable_shape: cableShape,
-      overall_diameter_mm: overallDiameter === '' ? null : overallDiameter,
-      diameter_under_sheath_mm: diameterUnderSheath === '' ? null : diameterUnderSheath,
+      // Only the dimension pair for the selected shape is sent -- the other
+      // pair is cleared rather than left over from a shape toggle earlier
+      // in this session.
+      overall_diameter_mm: cableShape === 'Round' && overallDiameter !== '' ? overallDiameter : null,
+      diameter_under_sheath_mm: cableShape === 'Round' && diameterUnderSheath !== '' ? diameterUnderSheath : null,
+      flat_width_mm: cableShape === 'Flat' && flatWidth !== '' ? flatWidth : null,
+      flat_height_mm: cableShape === 'Flat' && flatHeight !== '' ? flatHeight : null,
     }
     try {
       if (offlineQueue) {
@@ -179,17 +189,42 @@ export function ConstructionProfileForm({ sampleId, coresTested, suggestedCoreCo
             onChange={(v) => setCableShape(v as 'Round' | 'Flat')}
           />
         </Stack>
-        <NumberInput
-          label="Overall Diameter (OD)" description="Measured over the finished cable" suffix=" mm"
-          value={overallDiameter} onChange={(v) => setOverallDiameter(v === '' ? '' : Number(v))}
-          decimalScale={2} min={0}
-        />
-        <NumberInput
-          label="Diameter Under Sheath (ID)" description="Over laid-up cores, before outer sheath" suffix=" mm"
-          value={diameterUnderSheath} onChange={(v) => setDiameterUnderSheath(v === '' ? '' : Number(v))}
-          decimalScale={2} min={0}
-        />
+        {cableShape === 'Round' ? (
+          <>
+            <NumberInput
+              label="Overall Diameter (OD)" description="Measured over the finished cable" suffix=" mm"
+              value={overallDiameter} onChange={(v) => setOverallDiameter(v === '' ? '' : Number(v))}
+              decimalScale={2} min={0}
+            />
+            <NumberInput
+              label="Diameter Under Sheath (ID)" description="Over laid-up cores, before outer sheath" suffix=" mm"
+              value={diameterUnderSheath} onChange={(v) => setDiameterUnderSheath(v === '' ? '' : Number(v))}
+              decimalScale={2} min={0}
+            />
+          </>
+        ) : (
+          <>
+            <NumberInput
+              label="Width (W)" description="IS 694 cl.22, Table 10 — the longer overall dimension" suffix=" mm"
+              value={flatWidth} onChange={(v) => setFlatWidth(v === '' ? '' : Number(v))}
+              decimalScale={2} min={0}
+            />
+            <NumberInput
+              label="Height (H)" description="The shorter overall dimension" suffix=" mm"
+              value={flatHeight} onChange={(v) => setFlatHeight(v === '' ? '' : Number(v))}
+              decimalScale={2} min={0}
+            />
+          </>
+        )}
       </SimpleGrid>
+      {cableShape === 'Flat' && coresTested > 3 && (
+        <Alert color="yellow" variant="light" icon={<IconInfoCircle size={16} />}>
+          IS 694 cl.22 only defines flat-cable construction and dimensions for 2-core and 3-core
+          cables — this sample has {coresTested}. Recording it as Flat is still allowed, but its
+          dimensions won't match a published table entry; note that in Construction (free text) if
+          relevant.
+        </Alert>
+      )}
 
       <Divider label="Construction Layers" labelPosition="left" />
 
@@ -247,6 +282,7 @@ export function ConstructionProfileForm({ sampleId, coresTested, suggestedCoreCo
         armourStrandCount={typeof armourStrandCount === 'number' ? armourStrandCount : null}
         hasOuterSheath={sheathType !== 'None'}
         sheathType={sheathType}
+        cableShape={cableShape}
       />
 
       <Divider label="Doesn't match a real cable? Upload a hand-drawn/photographed diagram instead" labelPosition="left" />

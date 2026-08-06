@@ -295,8 +295,18 @@ class CableProfile(Base):
     # the outer sheath is applied) -- previously a genuine gap: the Test
     # Report template has a dedicated "Overall diameter in mm" row that this
     # app always left blank because nothing captured it.
+    #
+    # Round cables only -- "diameter" isn't a meaningful measurement for a
+    # flat cross-section.
     overall_diameter_mm = Column(Float, nullable=True)     # OD
     diameter_under_sheath_mm = Column(Float, nullable=True)  # ID
+
+    # Flat cables only (IS 694 cl.22, Table 10 -- "Overall Dimensions, Max
+    # (W x H)"). A flat cross-section has two independent dimensions, not
+    # one "diameter" -- these are genuinely different fields from OD/ID
+    # above, not a relabelling of them.
+    flat_width_mm = Column(Float, nullable=True)   # W
+    flat_height_mm = Column(Float, nullable=True)  # H
 
     marking_image_path = Column(String)
     source = Column(String, default="MANUAL")  # MANUAL | OCR_PENDING (OCR stubbed in MVP)

@@ -88,6 +88,7 @@ def _profile_brief(p: Optional[CableProfile]):
         "hand_drawn_diagram_url": f"/api/samples/{p.sample_id}/diagram-image" if p.hand_drawn_diagram_path else None,
         "cable_shape": p.cable_shape, "overall_diameter_mm": p.overall_diameter_mm,
         "diameter_under_sheath_mm": p.diameter_under_sheath_mm,
+        "flat_width_mm": p.flat_width_mm, "flat_height_mm": p.flat_height_mm,
     }
 
 
@@ -152,8 +153,13 @@ class ProfileRequest(BaseModel):
     armour_material: Optional[str] = None
     armour_strand_count: Optional[int] = None
     cable_shape: Optional[Literal["Round", "Flat"]] = "Round"
+    # Round only (IS 694 cl.9 / Table 5-7) -- a single diameter isn't a
+    # meaningful measurement for a flat cross-section.
     overall_diameter_mm: Optional[float] = None    # OD -- measured with calipers
     diameter_under_sheath_mm: Optional[float] = None  # ID -- over laid-up cores, before outer sheath
+    # Flat only (IS 694 cl.22, Table 10 -- "Overall Dimensions, Max (W x H)").
+    flat_width_mm: Optional[float] = None    # W
+    flat_height_mm: Optional[float] = None   # H
 
 
 class SubmitReadingRequest(BaseModel):
@@ -403,6 +409,8 @@ def submit_profile(db: Session, user: User, sample: Sample, body: ProfileRequest
     # csa_mm2 above.)
     profile.overall_diameter_mm = body.overall_diameter_mm  # type: ignore[assignment]
     profile.diameter_under_sheath_mm = body.diameter_under_sheath_mm  # type: ignore[assignment]
+    profile.flat_width_mm = body.flat_width_mm  # type: ignore[assignment]
+    profile.flat_height_mm = body.flat_height_mm  # type: ignore[assignment]
     db.flush()
 
     # Rule Engine: which tests apply, then expand into one AssignedTest row

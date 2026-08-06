@@ -28,6 +28,8 @@ class ProfileOut(BaseModel):
     cable_shape: Optional[str] = None
     overall_diameter_mm: Optional[float] = None
     diameter_under_sheath_mm: Optional[float] = None
+    flat_width_mm: Optional[float] = None
+    flat_height_mm: Optional[float] = None
 
 
 class StandardBrief(BaseModel):
