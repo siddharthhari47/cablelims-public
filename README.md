@@ -115,3 +115,9 @@ drops — raise this deliberately as coverage improves, don't let it silently re
 calculation engine against BIS-verified golden values, every C1–C19/H1–H22/B1–B12 security and
 correctness fix with its own regression test, and (B2) a clean-room reproduction of the documented
 first-time install.
+
+## License
+
+Proprietary. Copyright © 2026 Siddharth Hariharan. All rights reserved. Published for portfolio
+review only; see [LICENSE](LICENSE). This is not open source, and no permission is granted to use,
+copy, modify, deploy, or redistribute this code.
